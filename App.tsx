@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Platform, StatusBar, Button, GestureResponderEvent} from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Platform, StatusBar, Button, GestureResponderEvent, PanResponderGestureState} from 'react-native';
+import GestureRecognizer from 'react-native-swipe-gestures';
+
 import Table from './Table';
-import { Day, daysOfWeek, Mode, TimeRow, times, WeeklySchedule } from './types';
+import { Day, daysOfWeek, Mode, SwipeDirection, TimeRow, times, WeeklySchedule } from './types';
 
 const weeklyData = daysOfWeek.reduce((daysDict: WeeklySchedule, day) => {
   daysDict[day] = times.reduce((timesDict: TimeRow, time) => {
@@ -15,13 +17,13 @@ export default function App() {
   const [currentDay, setCurrentDay] = useState<Day>('MON')
   const [mode, setMode] = useState<Mode>('threeDay')
 
-  function nextDay(e: GestureResponderEvent) {
+  function nextDay() {
     const currentIndex = daysOfWeek.indexOf(currentDay)
     const chosenDay = currentIndex + 1 > daysOfWeek.length - 1 ? daysOfWeek[0] : daysOfWeek[currentIndex + 1]
     setCurrentDay(chosenDay)
   }
 
-  function prevDay(e: GestureResponderEvent) {
+  function prevDay() {
     const currentIndex = daysOfWeek.indexOf(currentDay)
     const chosenDay = currentIndex - 1 < 0 ? daysOfWeek[daysOfWeek.length - 1] : daysOfWeek[currentIndex - 1]
     setCurrentDay(chosenDay)
@@ -31,6 +33,19 @@ export default function App() {
     mode === 'threeDay' ? setMode('oneDay') : setMode('threeDay')
   }
 
+  function onSwipe(direction: SwipeDirection, e: PanResponderGestureState) {
+    switch (direction) {
+      case 'SWIPE_LEFT':
+        nextDay()
+        break;
+      case 'SWIPE_RIGHT':
+        prevDay()
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.titleText}>Weekly Schedule</Text>
@@ -38,12 +53,11 @@ export default function App() {
         <View>
           <Button title={mode} onPress={switchMode}></Button>
         </View>
-        <View style={styles.buttonContainer}>
-          <Button title='<--' onPress={prevDay}/>
-          <Button title='-->' onPress={nextDay}/>
-        </View>
       </View>
-      <Table weeklyData={weeklyData} startDay={currentDay} mode={mode}></Table>
+      {/* TODO: Consider replacing GestureRecognizer with well supported https://github.com/software-mansion/react-native-gesture-handler */}
+      <GestureRecognizer onSwipe={(direction, state) => onSwipe(direction, state)}>
+        <Table weeklyData={weeklyData} startDay={currentDay} mode={mode}></Table>
+      </GestureRecognizer>
     </SafeAreaView>
   );
 }

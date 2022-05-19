@@ -2,6 +2,7 @@ export type WeeklySchedule = Record<string, TimeRow>
 export type TimeRow = Record<string, string>
 export type Day = 'MON'|'TUE'|'WED'|'THU'|'FRI'|'SAT'|'SUN'
 export type Mode = 'oneDay'|'threeDay'
+export type SwipeDirection = 'SWIPE_UP'|'SWIPE_DOWN'|'SWIPE_LEFT'|'SWIPE_RIGHT'
 export interface CellProps {
     text: string,
     height?: number,

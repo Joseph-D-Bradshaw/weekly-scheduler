@@ -2,12 +2,21 @@ import React from "react"
 import { StyleSheet, ScrollView, Text, View, Dimensions } from 'react-native'
 import { CellProps, Day, TableProps, times, daysOfWeek } from "./types"
 
-
-
-function getBlockOf3Days(startDate: Day): string[] {
+/**
+ * 
+ * @param startDate 
+ * @returns threeDays since
+ */
+function getBlockOf3Days(startDate: Day): Day[3] {
     const start = daysOfWeek.indexOf(startDate)
     const end = start + 3
-    const threeDays = daysOfWeek.slice(start, end)
+    let threeDays = daysOfWeek.slice(start, end)
+
+    const missing = end - daysOfWeek.length
+    if (missing > 0) {
+        threeDays = threeDays.concat(daysOfWeek.slice(0, missing))
+    }
+
     return threeDays
 }
 
